@@ -1,0 +1,124 @@
+---
+title: "白地図 Japan"
+author: "全国版"
+format: 
+  dashboard:
+    orientation: columns
+    theme: minty
+server: shiny
+---
+
+```{r}
+#| context: setup
+
+library(shiny)
+library(shinyjs)
+library(tidyverse)
+library(sf)
+library(rmapshaper)
+source("helpers.R")
+```
+
+## Column {width=20%}
+
+```{r}
+useShinyjs()
+
+helpText("都道府県を選択すると、地図が表示されます。市町村を選択すると該当市町村が色付けされます。")
+
+# 都道府県選択
+selectInput(
+  inputId = "choose_pref",
+  label = "都道府県を選択",
+  choices = c("選択してください", prefs),
+  selected = "選択してください"
+)
+
+# 市町村選択
+selectInput(
+  inputId = "muni",
+  label = "市町村を選択",
+  choices = c("選択してください"),
+  selected = "選択してください"
+)
+
+checkboxInput("focus_muni", "市町村のみ表示", value = FALSE)
+br()
+downloadButton("download_map", "マップをダウンロード（.png）")
+```
+
+## Column {width=80%}
+
+```{r}
+plotOutput("map_plot")
+```
+
+```{r}
+#| context: server
+
+# 都道府県が変更された際に市町村の選択肢を動的に更新
+observe({
+  req(input$choose_pref)
+  if (input$choose_pref != "選択してください") {
+    # 選択された都道府県に対応する市町村リストを生成
+    munis <- generate_muni_choices(gis, input$choose_pref)
+    updateSelectInput(
+      session = getDefaultReactiveDomain(),
+      inputId = "muni",
+      choices = c("選択してください", munis),
+      selected = "選択してください"
+    )
+  } else {
+    updateSelectInput(
+      session = getDefaultReactiveDomain(),
+      inputId = "muni",
+      choices = c("選択してください"),
+      selected = "選択してください"
+    )
+  }
+})
+
+# 都道府県に基づくフィルタリング処理をreactive式で定義
+pref_region <- reactive({
+  req(input$choose_pref)
+  gis |> filter(pref == input$choose_pref)
+})
+
+# 市町村が選択されている場合のみフィルタリング
+# 選択されていなければNULL
+selected_region <- reactive({
+  if (!is.null(input$muni) && input$muni != "選択してください") {
+    pref_region() |> filter(muni == input$muni)
+  } else {
+    NULL
+  }
+})
+
+# 地図描画の出力
+output$map_plot <- renderPlot({
+  req(input$choose_pref)
+  render_map(pref_region(), selected_region(), input$focus_muni)
+})
+
+# ダウンロード処理
+output$download_map <- downloadHandler(
+  filename = function() {
+    paste0("map-", format(Sys.time(), "%Y-%m-%d_%H-%M-%S"), ".png")
+  },
+  content = function(file) {
+    png(file, width = 800, height = 600)
+    plot <- render_map(pref_region(), selected_region(), input$focus_muni)
+    print(plot)
+    dev.off()
+  }
+)
+
+# デバッグ用の入力状態表示
+output$info <- renderText({
+  paste(
+    "Selected Prefecture:", input$choose_pref, "\n",
+    "Selected Municipality:", ifelse(is.null(input$muni), "None", input$muni), "\n",
+    "Focus Municipality Only:", input$focus_muni
+  )
+})
+```
