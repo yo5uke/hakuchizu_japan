@@ -24,7 +24,7 @@ source("helpers.R")
 ```{r}
 useShinyjs()
 
-helpText("都道府県を選択すると、地図が表示されます。市町村を選択すると該当市町村が色付けされます。")
+helpText(  "都道府県を選択すると、地図が表示されます。市町村を選択すると該当市町村が色付けされます。")
 
 # 都道府県選択
 selectInput(
@@ -45,6 +45,8 @@ selectInput(
 checkboxInput("focus_muni", "市町村のみ表示", value = FALSE)
 br()
 downloadButton("download_map", "マップをダウンロード（.png）")
+
+actionButton("show_source", "出典・ライセンス情報")
 ```
 
 ## Column {width=80%}
@@ -121,4 +123,29 @@ output$info <- renderText({
     "Focus Municipality Only:", input$focus_muni
   )
 })
+
+observeEvent(input$show_source, {
+  showModal(
+    modalDialog(
+      title = "出典・ライセンス情報",
+      h3("データの出典"),
+      p("このアプリでは国土交通省の国土数値情報を使用しています。"),
+      p("出典：", 
+        a("国土数値情報ダウンロードサイト 行政区域データ", href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2024.html", target="_blank")
+      ),
+      p("ライセンス：",
+        a("CC-BY 4.0", href="https://creativecommons.org/licenses/by/4.0/",
+          target="_brank"),
+        ", 編集・加工済"
+      ),
+      h3("コードのライセンス"),
+      p("本アプリのソースコードはMIT Licenseのもとで公開されています。"),
+      a("GitHubリポジトリ", href="https://github.com/yo5uke/hakuchizu_japan", target="_blank"),
+      easyClose = TRUE,
+      footer = modalButton("閉じる")
+    )
+  )
+})
 ```
+
+
