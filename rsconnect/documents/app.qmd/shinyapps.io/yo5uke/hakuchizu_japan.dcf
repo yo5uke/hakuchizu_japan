@@ -5,7 +5,7 @@ account: yo5uke
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 14270609
-bundleId: 9961640
+bundleId: 9961965
 url: https://yo5uke.shinyapps.io/hakuchizu_japan/
 version: 1
 quarto_version: 1.7.15
