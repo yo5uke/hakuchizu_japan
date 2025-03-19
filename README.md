@@ -10,10 +10,10 @@
 
 本アプリの地図データは [国土交通省 国土数値情報ダウンロードサイト](https://nlftp.mlit.go.jp/) の[行政区域データ](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2024.html)を使用しています。
 
-- **ライセンス**: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-- **加工の有無**: 本アプリではデータを変換・加工しています。
+- **ライセンス**：[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **加工の有無**：本アプリではデータを変換・加工しています。
 
 ## ライセンス
 
-- **コード**: MIT License
-- **データ**: 国土交通省 国土数値情報（[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)）
+- **コード**：MIT License
+- **データ**：国土交通省 国土数値情報（[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)）
